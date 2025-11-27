@@ -1,6 +1,6 @@
 import { ENVEnum } from '@/common/enum/env.enum';
 import { PrismaService } from '@/lib/prisma/prisma.service';
-import { UtilsService } from '@/lib/utils/utils.service';
+import { AuthUtilsService } from '@/lib/utils/services/auth-utils.service';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -10,7 +10,7 @@ export class SuperAdminService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly utils: UtilsService,
+    private readonly authUtils: AuthUtilsService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -38,7 +38,7 @@ export class SuperAdminService implements OnModuleInit {
         data: {
           name: 'Super Admin',
           email: superAdminEmail,
-          password: await this.utils.hash(superAdminPass),
+          password: await this.authUtils.hash(superAdminPass),
           role: 'SUPER_ADMIN',
           isVerified: true,
           lastLoginAt: new Date(),

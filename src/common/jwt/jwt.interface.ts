@@ -9,3 +9,9 @@ export interface JWTPayload {
 export interface RequestWithUser extends Request {
   user?: JWTPayload;
 }
+
+export type TokenPair = {
+  accessToken: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: Date;
+};

@@ -34,6 +34,9 @@ export class UserResponseDto {
   profilePictureId?: string;
 
   @Expose()
+  profilePictureUrl?: string;
+
+  @Expose()
   avatarUrl?: string;
 
   // ===== Meta =====
