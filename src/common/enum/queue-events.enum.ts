@@ -13,7 +13,6 @@ export enum EventsEnum {
   MESSAGE_DELETE = 'private:message_delete', // Client -> Server: delete a message
   REACTION_ADD = 'private:reaction_add', // Client -> Server: add reaction
   REACTION_REMOVE = 'private:reaction_remove', // Client -> Server: remove reaction
-  FILE_UPLOAD_PROGRESS = 'private:file_upload_progress', // Client/Server: file upload progress updates
 
   // === Typing & Presence ===
   TYPING_START = 'private:typing_start',
@@ -27,7 +26,10 @@ export enum EventsEnum {
   CONVERSATION_RESPONSE = 'private:conversation_response', // Server -> Client (single)
   CONVERSATION_INITIATE = 'private:conversation_initiate', // Client -> Server: create or get existing conversation
   CONVERSATION_UPDATE = 'private:conversation_update', // Server -> Client: title/status change
-  CONVERSATION_DELETE = 'private:conversation_delete', // Client -> Server: request delete/archive
+  CONVERSATION_DELETE = 'private:conversation_delete', // Client -> Server: request delete
+  CONVERSATION_ARCHIVE = 'private:conversation_archive', // Client -> Server: archive conversation
+  CONVERSATION_BLOCK = 'private:conversation_block', // Client -> Server: block conversation
+  CONVERSATION_UNBLOCK = 'private:conversation_unblock', // Client -> Server: unblock conversation
 
   // === Calls lifecycle ===
   CALL_INITIATE = 'private:call_initiate', // Client -> Server
@@ -38,6 +40,9 @@ export enum EventsEnum {
   CALL_LEAVE = 'private:call_leave', // Client -> Server
   CALL_END = 'private:call_end', // Server -> other participant(s)
   CALL_MISSED = 'private:call_missed', // Server -> other participant
+  CALL_STATUS_UPDATE = 'private:call_status_update', // Server -> Client: call status changes (INITIATED/ONGOING/ENDED)
+  CALL_PARTICIPANT_JOINED = 'private:call_participant_joined', // Server -> other participants: someone joined
+  CALL_PARTICIPANT_LEFT = 'private:call_participant_left', // Server -> other participants: someone left
 
   // === WebRTC signaling (separate namespace 'rtc') ===
   // Client -> Server (requests)

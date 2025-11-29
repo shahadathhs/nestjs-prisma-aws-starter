@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { MessageDeliveryStatus, MessageType } from '@prisma/client';
+import { MessageDeliveryStatus, MessageType } from '@prisma';
 import {
   IsArray,
   IsEnum,
@@ -8,9 +8,6 @@ import {
   IsString,
 } from 'class-validator';
 
-// ----------------------
-// Base DTO
-// ----------------------
 export class BaseMessageDto {
   @ApiPropertyOptional({ description: 'Message content' })
   @IsOptional()
@@ -29,18 +26,43 @@ export class BaseMessageDto {
 }
 
 // ----------------------
-// Client → Admin
+// Send message
 // ----------------------
-export class ClientMessageDto extends BaseMessageDto {}
-
-// ----------------------
-// Admin → Client
-// ----------------------
-export class AdminMessageDto extends BaseMessageDto {
-  @ApiProperty({ description: 'Client ID to send message to' })
+export class SendMessageDto extends BaseMessageDto {
+  @ApiProperty({ description: 'ID of the conversation to send message to' })
   @IsNotEmpty()
   @IsString()
-  clientId: string;
+  conversationId: string;
+}
+
+// ----------------------
+// Edit message
+// ----------------------
+export class EditMessageDto {
+  @ApiProperty({ description: 'ID of the message to edit' })
+  @IsNotEmpty()
+  @IsString()
+  messageId: string;
+
+  @ApiProperty({ description: 'New content for the message' })
+  @IsNotEmpty()
+  @IsString()
+  content: string;
+}
+
+// ----------------------
+// Reaction management
+// ----------------------
+export class ReactionDto {
+  @ApiProperty({ description: 'ID of the message to react to' })
+  @IsNotEmpty()
+  @IsString()
+  messageId: string;
+
+  @ApiProperty({ description: 'Reaction emoji' })
+  @IsNotEmpty()
+  @IsString()
+  reaction: string;
 }
 
 // ----------------------
