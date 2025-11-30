@@ -1,6 +1,6 @@
 services:
   caddy:
-    profiles: ["prod"]
+    profiles: ['prod']
     image: caddy
     container_name: ${PACKAGE_NAME}_caddy
     restart: always
@@ -21,15 +21,15 @@ services:
       retries: 3
 
   coturn:
-    profiles: ["prod"]
+    profiles: ['prod']
     image: instrumentisto/coturn:latest
     container_name: ${PACKAGE_NAME}_coturn
     restart: always
     ports:
-      - "3478:3478/tcp"
-      - "3478:3478/udp"
-      - "5349:5349/tcp"
-      - "5349:5349/udp"
+      - '3478:3478/tcp'
+      - '3478:3478/udp'
+      - '5349:5349/tcp'
+      - '5349:5349/udp'
     env_file:
       - .env
     environment:
@@ -48,7 +48,7 @@ services:
       --realm=${PACKAGE_NAME}_turn
       --external-ip=${EXTERNAL_IP}
     healthcheck:
-      test: ["CMD-SHELL", "nc -zv -w 2 127.0.0.1 3478 || exit 1"]
+      test: ['CMD-SHELL', 'nc -zv -w 2 127.0.0.1 3478 || exit 1']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -94,8 +94,52 @@ services:
       timeout: 10s
       retries: 5
 
+  server-dev:
+    profiles: ['dev']
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ${PACKAGE_NAME}_api_dev
+    restart: always
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "200"
+      WATCHPACK_POLLING: "true"
+
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/${PACKAGE_NAME}_db
+
+      REDIS_HOST: redis-master
+      REDIS_PORT: 6379
+
+      BASE_URL: http://0.0.0.0:3000
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-master:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo '🏁 Waiting for DB...';
+        sleep 5;
+        npx prisma migrate deploy;
+        echo '🚀 Starting app in DEV mode...';
+        pnpm dev
+      "
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.pnpm-store
+
   db:
-    profiles: ["dev", "prod"]
+    profiles: ['dev', 'prod']
     image: postgres:17
     container_name: ${PACKAGE_NAME}_db
     restart: always
@@ -115,7 +159,7 @@ services:
       retries: 5
 
   redis-master:
-    profiles: ["dev", "prod"]
+    profiles: ['dev', 'prod']
     image: redis
     container_name: ${PACKAGE_NAME}_redis-master
     command:
@@ -138,7 +182,7 @@ services:
     restart: always
 
   redis-replica:
-    profiles: ["prod"]
+    profiles: ['prod']
     image: redis
     container_name: ${PACKAGE_NAME}_redis-replica
     command:

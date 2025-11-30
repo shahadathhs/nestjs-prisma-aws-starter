@@ -35,6 +35,7 @@
     "Buildx",
     "bullmq",
     "Caddyfile",
+    "CHOKIDAR",
     "conv",
     "coturn",
     "healthcheck",
@@ -42,6 +43,8 @@
     "isready",
     "replicaof",
     "softvence",
+    "USEPOLLING",
+    "WATCHPACK",
     "webrtc",
     "webrtcuser"
   ]

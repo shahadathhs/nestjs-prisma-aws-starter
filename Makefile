@@ -92,6 +92,15 @@ dev-services-down:
 
 # Start dev services and run pnpm dev
 dev:
+	@echo "Starting development environment..."
+	docker compose -f $(COMPOSE_FILE) --profile dev up --build
+
+# Build dev image explicitly
+dev-build:
+	docker compose -f $(COMPOSE_FILE) --profile dev build
+
+# Run local dev (without docker for api)
+dev-local:
 	@echo "Starting development services..."
 	@$(MAKE) dev-services
 	@echo "Waiting for services to be ready..."

@@ -18,6 +18,7 @@ export abstract class BaseGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   protected readonly logger: Logger;
+  protected readonly name: string;
   protected readonly clients = new Map<string, Set<Socket>>();
 
   @WebSocketServer()
@@ -30,11 +31,12 @@ export abstract class BaseGateway
     loggerName: string,
   ) {
     this.logger = new Logger(loggerName);
+    this.name = loggerName;
   }
 
   /**--- INIT --- */
-  afterInit(server: Server) {
-    this.logger.log('Socket.IO server initialized', server.adapter?.name ?? '');
+  afterInit() {
+    this.logger.log(`Socket.IO server initialized for ${this.name}`);
   }
 
   /** --- CONNECTION --- */
