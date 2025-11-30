@@ -9,7 +9,7 @@ APP_IMAGE := $(DOCKER_USERNAME)/$(PACKAGE_NAME):$(PACKAGE_VERSION)
 # Compose file
 COMPOSE_FILE := compose.yaml
 
-.PHONY: help build up upd down restart logs clean push containers volumes networks images dev-services dev-services-down dev
+.PHONY: help build up upd down restart logs clean push containers volumes networks images dev-services dev-services-down dev-local dev-docker dev-docker-build dev-docker-down dev-docker-logs dev-docker-clean
 
 help:
 	@echo "Available commands:"
@@ -29,7 +29,14 @@ help:
 	@echo "Development commands:"
 	@echo "  make dev-services      Start PostgreSQL and Redis for local development"
 	@echo "  make dev-services-down Stop development services"
-	@echo "  make dev               Start dev services and run pnpm dev"
+	@echo "  make dev-local         Start dev services and run pnpm dev locally"
+	@echo ""
+	@echo "Docker Development (Full Stack with Live Reload):"
+	@echo "  make dev-docker        Start full Docker dev environment with live reload"
+	@echo "  make dev-docker-build  Rebuild and start Docker dev environment"
+	@echo "  make dev-docker-down   Stop Docker dev environment"
+	@echo "  make dev-docker-logs   Show logs from Docker dev environment"
+	@echo "  make dev-docker-clean  Clean Docker dev environment (remove volumes)"
 
 # Build the Docker image
 build:
@@ -90,15 +97,6 @@ dev-services:
 dev-services-down:
 	docker compose -f $(COMPOSE_FILE) --profile dev down
 
-# Start dev services and run pnpm dev
-dev:
-	@echo "Starting development environment..."
-	docker compose -f $(COMPOSE_FILE) --profile dev up --build
-
-# Build dev image explicitly
-dev-build:
-	docker compose -f $(COMPOSE_FILE) --profile dev build
-
 # Run local dev (without docker for api)
 dev-local:
 	@echo "Starting development services..."
@@ -107,3 +105,25 @@ dev-local:
 	@sleep 3
 	@echo "Starting application in development mode..."
 	pnpm dev
+
+# Docker Development (Full Stack with Live Reload)
+# Start full Docker dev environment with live reload
+dev-docker:
+	docker compose -f compose.dev.yaml up
+
+# Rebuild and start Docker dev environment
+dev-docker-build:
+	docker compose -f compose.dev.yaml up --build
+
+# Stop Docker dev environment
+dev-docker-down:
+	docker compose -f compose.dev.yaml down
+
+# Show logs from Docker dev environment
+dev-docker-logs:
+	docker compose -f compose.dev.yaml logs -f
+
+# Clean Docker dev environment (remove volumes)
+dev-docker-clean:
+	docker compose -f compose.dev.yaml down --volumes --remove-orphans
+

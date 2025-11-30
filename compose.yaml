@@ -54,7 +54,7 @@ services:
       retries: 3
 
   server:
-    profiles: ["prod"]
+    profiles: ['prod']
     platform: linux/amd64
     image: ${DOCKER_USERNAME}/${PACKAGE_NAME}:${PACKAGE_VERSION}
     container_name: ${PACKAGE_NAME}_api
@@ -93,50 +93,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-  server-dev:
-    profiles: ['dev']
-    platform: linux/amd64
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    container_name: ${PACKAGE_NAME}_api_dev
-    restart: always
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: development
-      
-      CHOKIDAR_USEPOLLING: "true"
-      CHOKIDAR_INTERVAL: "200"
-      WATCHPACK_POLLING: "true"
-
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/${PACKAGE_NAME}_db
-
-      REDIS_HOST: redis-master
-      REDIS_PORT: 6379
-
-      BASE_URL: http://0.0.0.0:3000
-      PORT: 3000
-    ports:
-      - '3000:3000'
-    depends_on:
-      db:
-        condition: service_healthy
-      redis-master:
-        condition: service_healthy
-    command: >
-      sh -c "
-        echo '🏁 Waiting for DB...';
-        sleep 5;
-        npx prisma migrate deploy;
-        echo '🚀 Starting app in DEV mode...';
-        pnpm dev
-      "
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.pnpm-store
 
   db:
     profiles: ['dev', 'prod']

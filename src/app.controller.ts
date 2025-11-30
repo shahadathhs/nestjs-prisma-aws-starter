@@ -29,4 +29,16 @@ export class AppController {
       timestamp: new Date().toISOString(),
     };
   }
+
+  @Get('version')
+  @ApiOperation({
+    summary: 'Version check',
+    description: 'Returns API version.',
+  })
+  @ApiResponse({ status: 200, description: 'API version info.' })
+  version() {
+    return {
+      version: '1.0.0',
+    };
+  }
 }

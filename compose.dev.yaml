@@ -1,0 +1,104 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ${PACKAGE_NAME}_dev_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/${PACKAGE_NAME}_db
+      REDIS_HOST: redis-master
+      REDIS_PORT: 6379
+      BASE_URL: http://0.0.0.0:3000
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    volumes:
+      # Mount source code for live reload
+      - ./src:/usr/src/app/src
+      - ./prisma:/usr/src/app/prisma
+      - ./prisma.config.ts:/usr/src/app/prisma.config.ts
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+      # Prevent overwriting node_modules and dist
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+      # Mount uploads and temp directories
+      - ./uploads:/usr/src/app/uploads
+      - ./temp:/usr/src/app/temp
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-master:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo '🏁 Waiting for DB...';
+        sleep 3;
+        echo '🔄 Running Prisma migrations...';
+        npx prisma migrate deploy || echo 'Migration failed, continuing...';
+        echo '🚀 Starting app in development mode with live reload...';
+        pnpm dev
+      "
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://0.0.0.0:3000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  db:
+    image: postgres:17
+    container_name: ${PACKAGE_NAME}_dev_db
+    restart: unless-stopped
+    user: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${PACKAGE_NAME}_db
+    volumes:
+      - dev_db_data:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-master:
+    image: redis:latest
+    container_name: ${PACKAGE_NAME}_dev_redis
+    command:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
+    ports:
+      - '22376:6379'
+    volumes:
+      - dev_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  dev_db_data:
+  dev_redis_data:
+
+networks:
+  default:
+    name: ${PACKAGE_NAME}_dev_network
+    labels:
+      - 'project=${PACKAGE_NAME}'
+      - 'environment=development'

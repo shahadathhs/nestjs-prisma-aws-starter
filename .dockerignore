@@ -19,9 +19,6 @@ uploads
 .vscode
 .vercel
 
-# Prisma artifacts
-prisma/generated
-
 # Cache
 .cache
 npm-debug.log

@@ -1,10 +1,11 @@
+# Development Dockerfile with Live Reload Support
 FROM node:24-slim
 
 # Enable corepack and activate pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Set working directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Install system dependencies
 RUN apt update && apt install -y openssl procps
@@ -15,11 +16,22 @@ COPY package.json pnpm-lock.yaml ./
 # Install dependencies
 RUN pnpm install
 
-# Copy the rest of the application code
+# Copy Prisma configuration
+COPY prisma.config.ts ./
+COPY prisma ./prisma/
+
+# Copy tsconfig
+COPY tsconfig.json ./
+
+# Copy source code
 COPY . .
 
-# Expose the port
+# Create directories for volumes and set permissions
+RUN mkdir -p /usr/src/app/dist /usr/src/app/uploads /usr/src/app/temp && \
+    chmod -R 777 /usr/src/app
+
+# Expose port
 EXPOSE 3000
 
-# Start the application in development mode
+# Run the app in development mode with watch
 CMD ["pnpm", "dev"]

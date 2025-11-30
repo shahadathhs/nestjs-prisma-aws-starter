@@ -57,6 +57,7 @@ pids
 *.seed
 *.pid.lock
 *.pem
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -66,4 +67,8 @@ logs
 # temp dir
 temp
 tmp
-*.json
+
+# Ignore temporary/generated JSON files only
+*.log.json
+report.*.json
+coverage.json
