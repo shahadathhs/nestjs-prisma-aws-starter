@@ -8,6 +8,11 @@ APP_IMAGE := $(DOCKER_USERNAME)/$(PACKAGE_NAME):$(PACKAGE_VERSION)
 
 # Compose file
 COMPOSE_FILE := compose.yaml
+DEV_COMPOSE_FILE := compose.dev.yaml
+
+# Dockerfile
+DOCKERFILE := Dockerfile
+DEV_DOCKERFILE := Dockerfile.dev
 
 .PHONY: help build up upd down restart logs clean push containers volumes networks images dev-services dev-services-down dev-local dev-docker dev-docker-build dev-docker-down dev-docker-logs dev-docker-clean
 
@@ -108,8 +113,11 @@ dev-local:
 
 # Docker Development (Full Stack with Live Reload)
 # Start full Docker dev environment with live reload
+dev-build:
+	docker compose -f $(DEV_COMPOSE_FILE) build
+
 dev-docker:
-	docker compose -f compose.dev.yaml up
+	docker compose -f $(DEV_COMPOSE_FILE) up
 
 # Rebuild and start Docker dev environment
 dev-docker-build:

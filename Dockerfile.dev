@@ -1,37 +1,39 @@
 # Development Dockerfile with Live Reload Support
 FROM node:24-slim
 
-# Enable corepack and activate pnpm
+# Enable corepack and pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Set working directory
 WORKDIR /usr/src/app
 
-# Install system dependencies
+# Install OS dependencies
 RUN apt update && apt install -y openssl procps
 
-# Copy package files
+# Copy only dependency files
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install
 
-# Copy Prisma configuration
+# Copy Prisma schema + config
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
-# Copy tsconfig
+# Copy ts & nest config
 COPY tsconfig.json ./
+COPY nest-cli.json ./
 
-# Copy source code
-COPY . .
+# Copy source code (src only - clean)
+COPY src ./src
 
-# Create directories for volumes and set permissions
-RUN mkdir -p /usr/src/app/dist /usr/src/app/uploads /usr/src/app/temp && \
-    chmod -R 777 /usr/src/app
+# (DO NOT create dist manually - removed)
 
-# Expose port
+# Create uploads and temp folders
+RUN mkdir -p /usr/src/app/uploads /usr/src/app/temp
+
+# Expose app port
 EXPOSE 3000
 
-# Run the app in development mode with watch
+# Start NestJS dev mode
 CMD ["pnpm", "dev"]

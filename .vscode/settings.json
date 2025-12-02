@@ -41,6 +41,7 @@
     "healthcheck",
     "instrumentisto",
     "isready",
+    "procps",
     "replicaof",
     "softvence",
     "USEPOLLING",

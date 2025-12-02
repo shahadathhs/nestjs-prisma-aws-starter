@@ -18,13 +18,15 @@ services:
       - '3000:3000'
     volumes:
       # Mount source code for live reload
-      - ./src:/usr/src/app/src
-      - ./prisma:/usr/src/app/prisma
-      - ./prisma.config.ts:/usr/src/app/prisma.config.ts
-      - ./tsconfig.json:/usr/src/app/tsconfig.json
-      # Prevent overwriting node_modules and dist
+      - ./src:/usr/src/app/src:cached
+      - ./prisma:/usr/src/app/prisma:cached
+      - ./prisma.config.ts:/usr/src/app/prisma.config.ts:cached
+      - ./tsconfig.json:/usr/src/app/tsconfig.json:cached
+      - ./nest-cli.json:/usr/src/app/nest-cli.json:cached
+
+      # Keep node_modules in container
       - /usr/src/app/node_modules
-      - /usr/src/app/dist
+
       # Mount uploads and temp directories
       - ./uploads:/usr/src/app/uploads
       - ./temp:/usr/src/app/temp
