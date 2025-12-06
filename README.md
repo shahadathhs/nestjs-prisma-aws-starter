@@ -5,6 +5,7 @@ A production-ready, feature-rich starter template for building scalable backend 
 ## 🚀 Features
 
 ### Core Stack
+
 - **NestJS** - Progressive Node.js framework
 - **Prisma ORM** - Type-safe database access with split schema architecture
 - **PostgreSQL** - Primary database
@@ -13,6 +14,7 @@ A production-ready, feature-rich starter template for building scalable backend 
 - **Docker** - Production and development containers
 
 ### Authentication & Security
+
 - JWT-based authentication with refresh tokens
 - Email verification via OTP
 - Password reset flow
@@ -21,6 +23,7 @@ A production-ready, feature-rich starter template for building scalable backend 
 - Passport.js integration
 
 ### Real-time Features
+
 - WebSocket Gateway with Socket.IO
 - Private messaging system
 - Conversation management (archive, block, delete)
@@ -28,17 +31,22 @@ A production-ready, feature-rich starter template for building scalable backend 
 - Live reload in development
 
 ### File Management
+
 - File upload with Multer
 - AWS S3 integration
 - Configurable upload limits (up to 500MB via Caddy)
 
 ### Background Jobs
+
 - BullMQ job queues
 - Event-driven architecture with EventEmitter
 - Scheduled tasks with @nestjs/schedule
 
 ### Developer Experience
-- **Husky** - Pre-commit hooks for code quality
+
+- **Husky** - Git hooks made easy
+- **Commitlint** - Lint commit messages
+- **Lint Staged** - Run linters on staged files
 - **ESLint + Prettier** - Automated linting and formatting
 - **CI/CD** - GitHub Actions workflow
 - **Swagger** - API documentation
@@ -90,6 +98,7 @@ A production-ready, feature-rich starter template for building scalable backend 
 ## 🛠️ Setup & Installation
 
 ### Prerequisites
+
 - Node.js 24+
 - pnpm 10+
 - Docker & Docker Compose
@@ -97,6 +106,7 @@ A production-ready, feature-rich starter template for building scalable backend 
 - Redis
 
 ### Environment Variables
+
 Copy `.env.example` to `.env` and configure:
 
 ```bash
@@ -153,6 +163,7 @@ pnpm dev
 ```
 
 Or use the combined command:
+
 ```bash
 make local
 ```
@@ -193,6 +204,7 @@ make stop
 ### Makefile Commands
 
 #### Production (Default)
+
 - `make build` - Build Docker image
 - `make up` - Start containers (attached)
 - `make start` - Start containers (detached)
@@ -205,6 +217,7 @@ make stop
 - `make ps` - List containers
 
 #### Development (Full Docker)
+
 - `make dev-up` - Start dev environment
 - `make dev-stop` - Stop dev environment
 - `make dev-logs` - Show dev logs
@@ -212,11 +225,13 @@ make stop
 - `make dev-ps` - List dev containers
 
 #### Local Development (Hybrid)
+
 - `make local-up` - Start DB & Redis only
 - `make local-down` - Stop DB & Redis
 - `make local` - Start deps + run `pnpm dev`
 
 #### General
+
 - `make images` - List Docker images
 - `make volumes` - List Docker volumes
 - `make networks` - List Docker networks
@@ -270,6 +285,7 @@ GitHub Actions workflow (`.github/workflows/ci-cd.yml`):
 ## 🐳 Docker Architecture
 
 ### Production (`compose.yaml`)
+
 - **server** - NestJS API (multi-stage build)
 - **db** - PostgreSQL 17
 - **redis-master** - Redis primary
@@ -278,11 +294,13 @@ GitHub Actions workflow (`.github/workflows/ci-cd.yml`):
 - **coturn** - TURN server for WebRTC
 
 ### Development (`compose.dev.yaml`)
+
 - **app** - NestJS with hot reload
 - **db** - PostgreSQL
 - **redis-master** - Redis
 
 ### Key Features
+
 - Health checks for all services
 - Volume persistence
 - Network isolation
@@ -291,18 +309,22 @@ GitHub Actions workflow (`.github/workflows/ci-cd.yml`):
 ## 📝 Code Quality
 
 ### Pre-commit Hooks
-Husky runs `scripts/ci-hooks.js` on every commit:
-- Lints staged files
-- Formats code
-- Auto-stages fixes
-- Provides colorful output
+
+### Pre-commit Hooks
+
+Husky triggers `lint-staged` and `commitlint` on commit:
+
+- **Lint Staged**: Runs `eslint` and `prettier` on staged files to ensure code quality before it's committed.
+- **Commitlint**: Enforces conventional commit message format (e.g., `feat: add new feature`).
 
 ### Linting & Formatting
+
 - **ESLint** - TypeScript-ESLint rules
 - **Prettier** - Consistent code style
 - **Auto-fix** - Both tools auto-fix on commit
 
 ## 🔐 Security Features
+
 - JWT with refresh token rotation
 - Bcrypt password hashing
 - OTP-based email verification
