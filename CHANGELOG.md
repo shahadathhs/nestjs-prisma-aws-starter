@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/shahadathhs/nestjs-prisma-aws-starter/compare/v1.0.0...v1.0.1) (2025-12-07)
+
+### Bug Fixes
+
+- dockerization fixed ([63bfc7d](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/63bfc7d596e4dca9d86b4167811eb318c61e5ce4))
+- removed md file ([0d9edf1](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/0d9edf1aabeb178516e4f8203cf267bb5b260dff))
+
 # 1.0.0 (2025-12-06)
 
 ### Features

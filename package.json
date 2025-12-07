@@ -1,6 +1,6 @@
 {
   "name": "nestjs-prisma-aws-starter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This repository contains the source code for the NestJS + Prisma + AWS Starter.",
   "author": "https://github.com/shahadathhs",
   "private": true,
