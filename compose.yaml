@@ -178,6 +178,40 @@ services:
       - redis-master
     restart: always
 
+  backup:
+    profiles: ['prod']
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: ${PACKAGE_NAME}_backup
+    restart: always
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${PACKAGE_NAME}_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      BACKUP_SCHEDULE: "0 2 * * *"  # Daily at 2:00 AM
+      RETENTION_DAYS: 7
+      COMPRESSION: gzip
+      BACKUP_FORMAT: custom
+      # AWS S3 Configuration (optional)
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-}
+      AWS_S3_PREFIX: database-backups
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    volumes:
+      - backups-data:/backups
+      - ./scripts:/scripts:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+
 volumes:
   db_data:
   files-data:
@@ -185,6 +219,7 @@ volumes:
   logs-data:
   caddy_data:
   caddy_config:
+  backups-data:
 
 networks:
   default:

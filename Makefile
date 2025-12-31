@@ -14,7 +14,7 @@ DEV_COMPOSE_FILE := compose.dev.yaml
 DOCKERFILE := Dockerfile
 DEV_DOCKERFILE := Dockerfile.dev
 
-.PHONY: help build up start stop restart logs logs-api clean push ps dev-up dev-stop dev-logs dev-clean dev-ps local-up local-down local images volumes networks
+.PHONY: help build up start stop restart logs logs-api clean push ps dev-up dev-stop dev-logs dev-clean dev-ps local-up local-down local images volumes networks backup-list backup-manual backup-logs backup-restore
 
 help:
 	@echo "Available commands:"
@@ -47,6 +47,12 @@ help:
 	@echo "  make images            List images"
 	@echo "  make volumes           List volumes"
 	@echo "  make networks          List networks"
+	@echo ""
+	@echo "Backup Commands:"
+	@echo "  make backup-list       List available backups"
+	@echo "  make backup-manual     Create manual backup"
+	@echo "  make backup-logs       Show backup service logs"
+	@echo "  make backup-restore    Restore from backup (interactive)"
 	@echo ""
 
 # ==========================================
@@ -140,3 +146,50 @@ volumes:
 
 networks:
 	docker network ls
+
+# ==========================================
+# Backup Commands
+# ==========================================
+
+backup-list:
+	@echo "Available backups:"
+	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
+		docker exec $(PACKAGE_NAME)_backup /scripts/restore-database.sh list; \
+	else \
+		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+	fi
+
+backup-manual:
+	@echo "Creating manual backup..."
+	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
+		docker exec $(PACKAGE_NAME)_backup /scripts/backup-database.sh; \
+	else \
+		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+	fi
+
+backup-logs:
+	@echo "Backup service logs:"
+	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
+		docker exec $(PACKAGE_NAME)_backup tail -f /backups/cron.log; \
+	else \
+		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+	fi
+
+backup-restore:
+	@echo "Available backups:"
+	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
+		docker exec $(PACKAGE_NAME)_backup /scripts/restore-database.sh list; \
+		echo ""; \
+		read -p "Enter backup filename to restore: " backup_file; \
+		if [ -n "$$backup_file" ]; then \
+			echo "WARNING: This will replace the current database. Are you sure? [y/N]"; \
+			read -r confirm; \
+			if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+				docker exec $(PACKAGE_NAME)_backup /bin/bash -c "FORCE_RESTORE=true /scripts/restore-database.sh restore $$backup_file"; \
+			else \
+				echo "Restore cancelled."; \
+			fi; \
+		fi; \
+	else \
+		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+	fi
