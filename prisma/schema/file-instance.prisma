@@ -11,6 +11,9 @@ model FileInstance {
 
   users           User[]
   privateMessages PrivateMessage[]
+  
+  // Add this relation
+  mergeJob VideoMergeJob?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -26,4 +29,22 @@ enum FileType {
   any
   video
   audio
+}
+
+model VideoMergeJob {
+  id String @id @default(uuid())
+
+  jobId         String   @unique // AWS MediaConvert Job ID
+  outputUrl     String   // S3 URL of the merged video
+  outputFileId  String?  @unique // Reference to FileInstance after merge completes
+  status        String   @default("SUBMITTED") // SUBMITTED, PROGRESSING, COMPLETE, ERROR, CANCELED
+  errorMessage  String?  // Store error details if job fails
+  sourceFileIds String[] // Array of FileInstance IDs that were merged
+
+  outputFile FileInstance? @relation(fields: [outputFileId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("video_merge_jobs")
 }

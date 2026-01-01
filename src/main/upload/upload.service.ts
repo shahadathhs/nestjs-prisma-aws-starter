@@ -93,4 +93,68 @@ export class UploadService {
 
     return successResponse(file, 'File found');
   }
+
+  @HandleError('Failed to merge videos', 'File')
+  async mergeVideos(files: Express.Multer.File[]): Promise<TResponse<any>> {
+    if (!files || files.length === 0) {
+      throw new AppError(400, 'No files provided');
+    }
+
+    if (files.length < 2) {
+      throw new AppError(400, 'At least 2 videos are required for merging');
+    }
+
+    if (files.length > 10) {
+      throw new AppError(400, 'You can merge a maximum of 10 videos at once');
+    }
+
+    // Validate all files are videos
+    const invalidFiles = files.filter(
+      (file) => !file.mimetype.startsWith('video/'),
+    );
+
+    if (invalidFiles.length > 0) {
+      throw new AppError(
+        400,
+        `Invalid file types detected. Only video files are allowed. Found: ${invalidFiles.map((f) => f.mimetype).join(', ')}`,
+      );
+    }
+
+    // Upload all videos to S3 in parallel
+    const uploadedFiles = await Promise.all(
+      files.map((file) => this.s3.uploadFile(file)),
+    );
+
+    // Extract video URLs
+    const videoUrls = uploadedFiles.map((file) => file.url);
+
+    // Create merge job in AWS MediaConvert
+    const { jobId, outputUrl } = await this.s3.createMergeJob(videoUrls);
+
+    // Save the merge job to database for tracking
+    const mergeRecord = await this.prisma.client.videoMergeJob.create({
+      data: {
+        jobId,
+        outputUrl,
+        status: 'SUBMITTED',
+        sourceFileIds: uploadedFiles.map((f) => f.id),
+      },
+    });
+
+    return successResponse(
+      {
+        jobId,
+        outputUrl,
+        status: 'SUBMITTED',
+        mergeId: mergeRecord.id,
+        sourceFiles: uploadedFiles.map((f) => ({
+          id: f.id,
+          filename: f.originalFilename,
+          url: f.url,
+          size: f.size,
+        })),
+      },
+      'Videos uploaded and merge job created successfully',
+    );
+  }
 }

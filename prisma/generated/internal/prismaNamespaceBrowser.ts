@@ -54,6 +54,7 @@ export const ModelName = {
   UserOtp: 'UserOtp',
   RefreshToken: 'RefreshToken',
   FileInstance: 'FileInstance',
+  VideoMergeJob: 'VideoMergeJob',
   Notification: 'Notification',
   UserNotification: 'UserNotification',
   PrivateCall: 'PrivateCall',
@@ -119,6 +120,21 @@ export const FileInstanceScalarFieldEnum = {
 } as const
 
 export type FileInstanceScalarFieldEnum = (typeof FileInstanceScalarFieldEnum)[keyof typeof FileInstanceScalarFieldEnum]
+
+
+export const VideoMergeJobScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  outputUrl: 'outputUrl',
+  outputFileId: 'outputFileId',
+  status: 'status',
+  errorMessage: 'errorMessage',
+  sourceFileIds: 'sourceFileIds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VideoMergeJobScalarFieldEnum = (typeof VideoMergeJobScalarFieldEnum)[keyof typeof VideoMergeJobScalarFieldEnum]
 
 
 export const NotificationScalarFieldEnum = {
@@ -253,6 +269,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: 'DbNull',
   JsonNull: 'JsonNull',
@@ -260,12 +284,4 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
