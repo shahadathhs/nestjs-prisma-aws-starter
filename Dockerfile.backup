@@ -1,103 +1,24 @@
-FROM postgres:17-alpine
+# Minimal local backup container
+FROM alpine:3.18
 
-# Install required packages
-RUN apk add --no-cache \
-    bash \
-    curl \
-    aws-cli \
-    gzip \
-    bzip2 \
-    xz \
-    coreutils \
-    findutils \
-    cron \
-    tzdata
+# Install only what we need
+RUN apk add --no-cache bash gzip tar findutils postgresql-client
 
-# Set timezone
-ENV TZ=UTC
-
-# Create backup directory
+# Create directories
 RUN mkdir -p /backups /scripts
 
 # Copy backup scripts
 COPY scripts/backup-database.sh /scripts/backup-database.sh
 COPY scripts/restore-database.sh /scripts/restore-database.sh
-COPY scripts/backup.env /scripts/backup.env
 
 # Make scripts executable
 RUN chmod +x /scripts/backup-database.sh /scripts/restore-database.sh
 
-# Create cron job
-RUN echo '# Database Backup Cron Job' > /etc/crontabs/root && \
-    echo '# Backup daily at 2:00 AM (can be customized via BACKUP_SCHEDULE env var)' >> /etc/crontabs/root && \
-    echo '0 2 * * * /scripts/backup-database.sh >> /backups/cron.log 2>&1' >> /etc/crontabs/root
-
-# Create entrypoint script
-RUN cat > /scripts/entrypoint.sh << 'EOF'
-#!/bin/bash
-
-# Load backup configuration
-if [ -f /scripts/backup.env ]; then
-    export $(grep -v '^#' /scripts/backup.env | xargs)
-fi
-
-# Set default values if not provided
-export DB_HOST="${DB_HOST:-db}"
-export DB_PORT="${DB_PORT:-5432}"
-export DB_NAME="${DB_NAME:-nestjs_starter_db}"
-export DB_USER="${DB_USER:-postgres}"
-export DB_PASSWORD="${DB_PASSWORD:-postgres}"
-export BACKUP_DIR="${BACKUP_DIR:-/backups}"
-export RETENTION_DAYS="${RETENTION_DAYS:-7}"
-export COMPRESSION="${COMPRESSION:-gzip}"
-export BACKUP_FORMAT="${BACKUP_FORMAT:-custom}"
-
-# Update cron schedule if provided
-if [ -n "$BACKUP_SCHEDULE" ]; then
-    echo "Setting custom backup schedule: $BACKUP_SCHEDULE"
-    sed -i '/0 2 \* \* \*/d' /etc/crontabs/root
-    echo "$BACKUP_SCHEDULE /scripts/backup-database.sh >> /backups/cron.log 2>&1" >> /etc/crontabs/root
-fi
-
-# Start cron daemon
-echo "Starting backup service with cron daemon..."
-crond -f -l 2 &
-CRON_PID=$!
-
-# Function to handle shutdown
-shutdown() {
-    echo "Shutting down backup service..."
-    kill $CRON_PID
-    exit 0
-}
-
-# Trap signals
-trap shutdown SIGTERM SIGINT
-
-# Keep container running
-echo "Backup service is running. Logs are available in /backups/cron.log"
-echo "Manual backup: /scripts/backup-database.sh"
-echo "List backups: /scripts/restore-database.sh list"
-echo "Restore backup: /scripts/restore-database.sh restore <backup_file>"
-
-# Show cron schedule
-echo "Current cron schedule:"
-crontab -l
-
-tail -f /backups/cron.log &
-TAIL_PID=$!
-
-# Wait for cron process
-wait $CRON_PID
-EOF
-
-RUN chmod +x /scripts/entrypoint.sh
-
-# Expose backup directory as volume
-VOLUME ["/backups"]
-
 # Set working directory
 WORKDIR /scripts
 
-# Start the backup service
-CMD ["/scripts/entrypoint.sh"]
+# Expose backup volume
+VOLUME ["/backups"]
+
+# Default command: run backup script (manual or via docker-compose loop)
+CMD ["bash", "/scripts/backup-database.sh"]

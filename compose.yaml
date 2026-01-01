@@ -197,20 +197,14 @@ services:
       RETENTION_DAYS: 7
       COMPRESSION: gzip
       BACKUP_FORMAT: custom
-      # AWS S3 Configuration (optional)
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-}
-      AWS_S3_PREFIX: database-backups
-      AWS_REGION: ${AWS_REGION:-us-east-1}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
     volumes:
-      - backups-data:/backups
+      - db_data:/var/lib/postgresql/data:ro   # read-only
+      - files-data:/app/uploads:ro            # read-only
+      - backups-data:/backups                 # backup storage
       - ./scripts:/scripts:ro
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - default
 
 volumes:
   db_data:
