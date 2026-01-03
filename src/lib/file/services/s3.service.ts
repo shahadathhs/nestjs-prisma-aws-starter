@@ -2,6 +2,7 @@ import { ENVEnum } from '@/common/enum/env.enum';
 import { AppError } from '@/core/error/handle-error.app';
 import { PrismaService } from '@/lib/prisma/prisma.service';
 import {
+  AacCodingMode,
   AudioCodec,
   AudioDefaultSelection,
   CreateJobCommand,
@@ -200,7 +201,7 @@ export class S3Service {
     const outputName = `merged-${uuid()}.mp4`;
     const s3Destination = `s3://${this.AWS_S3_BUCKET_NAME}/merged/`;
 
-    // Create Inputs: each input needs a unique AudioSelector name
+    // Create Inputs: each input gets a unique AudioSelector
     const inputs = videoUrls.map((url, index) => ({
       FileInput: url,
       AudioSelectors: {
@@ -216,8 +217,7 @@ export class S3Service {
       JSON.stringify(inputs, null, 2),
     );
 
-    // AudioDescriptions: reference first input selector
-    // MediaConvert can merge all video inputs into one output
+    // One AudioDescription pointing to the first input selector
     const audioDescriptions = [
       {
         AudioSelectorName: 'AudioSelector0', // must match first input selector
@@ -225,14 +225,13 @@ export class S3Service {
           Codec: AudioCodec.AAC,
           AacSettings: {
             Bitrate: 96000,
-            CodingMode: 'CODING_MODE_2_0' as const,
+            CodingMode: AacCodingMode.CODING_MODE_2_0,
             SampleRate: 48000,
           },
         },
       },
     ];
 
-    // VideoDescriptions: one output for all inputs
     const videoDescription = {
       CodecSettings: {
         Codec: VideoCodec.H_264,
@@ -244,6 +243,7 @@ export class S3Service {
       },
     };
 
+    // Send CreateJobCommand
     const command = new CreateJobCommand({
       Role: this.AWS_MEDIACONVERT_ROLE_ARN,
       Settings: {
@@ -256,6 +256,7 @@ export class S3Service {
             },
             Outputs: [
               {
+                NameModifier: outputName.replace('.mp4', ''), // important!
                 ContainerSettings: { Container: 'MP4' },
                 VideoDescription: videoDescription,
                 AudioDescriptions: audioDescriptions,
@@ -277,6 +278,99 @@ export class S3Service {
       `Created merge job with ID: ${result.Job.Id}`,
       JSON.stringify(result, null, 2),
     );
+
+    return {
+      jobId: result.Job.Id,
+      outputUrl: `https://${this.AWS_S3_BUCKET_NAME}.s3.${this.AWS_REGION}.amazonaws.com/merged/${outputName}`,
+    };
+  }
+
+  async createMergeTwoVideos(
+    video1: string,
+    video2: string,
+  ): Promise<{ jobId: string; outputUrl: string }> {
+    const outputName = `merged-${uuid()}.mp4`;
+    const s3Destination = `s3://${this.AWS_S3_BUCKET_NAME}/merged/`;
+
+    // Use InputClippings to stitch videos sequentially
+    const inputs = [
+      {
+        FileInput: video1,
+        AudioSelectors: {
+          'Audio Selector 1': {
+            DefaultSelection: AudioDefaultSelection.DEFAULT,
+          },
+        },
+        VideoSelector: {},
+      },
+      {
+        FileInput: video2,
+        AudioSelectors: {
+          'Audio Selector 2': {
+            DefaultSelection: AudioDefaultSelection.DEFAULT,
+          },
+        },
+        VideoSelector: {},
+      },
+    ];
+
+    // Reference the audio selector from the first input
+    // Note: When merging sequentially, only the first input's audio is typically used
+    // unless you configure input stitching differently
+    const audioDescriptions = [
+      {
+        AudioSourceName: 'Audio Selector 1', // This references the selector from Input 1
+        CodecSettings: {
+          Codec: AudioCodec.AAC,
+          AacSettings: {
+            Bitrate: 96000,
+            CodingMode: AacCodingMode.CODING_MODE_2_0,
+            SampleRate: 48000,
+          },
+        },
+      },
+    ];
+
+    const videoDescription = {
+      CodecSettings: {
+        Codec: VideoCodec.H_264,
+        H264Settings: {
+          RateControlMode: H264RateControlMode.QVBR,
+          MaxBitrate: 5000000,
+          SceneChangeDetect: H264SceneChangeDetect.TRANSITION_DETECTION,
+        },
+      },
+    };
+
+    const command = new CreateJobCommand({
+      Role: this.AWS_MEDIACONVERT_ROLE_ARN,
+      Settings: {
+        Inputs: inputs as any,
+        OutputGroups: [
+          {
+            OutputGroupSettings: {
+              Type: 'FILE_GROUP_SETTINGS',
+              FileGroupSettings: { Destination: s3Destination },
+            },
+            Outputs: [
+              {
+                ContainerSettings: { Container: 'MP4' },
+                NameModifier: outputName.replace('.mp4', ''),
+                VideoDescription: videoDescription,
+                AudioDescriptions: audioDescriptions,
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    const result = await this.mediaConvert.send(command);
+
+    if (!result.Job?.Id) {
+      this.logger.error('Failed to create merge job', result);
+      throw new AppError(500, 'Failed to create merge job');
+    }
 
     return {
       jobId: result.Job.Id,
