@@ -164,4 +164,29 @@ export class UploadService {
       'Videos uploaded and merge job created successfully',
     );
   }
+
+  @HandleError('Failed to check merge job status', 'File')
+  async getMergeJobStatus(mergeId: string): Promise<TResponse<any>> {
+    const mergeJob = await this.prisma.client.videoMergeJob.findUnique({
+      where: { id: mergeId },
+    });
+
+    if (!mergeJob) {
+      throw new AppError(404, 'Merge job not found');
+    }
+
+    const jobId = mergeJob.jobId;
+
+    const status = await this.s3.getMergeJobStatus(jobId);
+
+    return successResponse(
+      {
+        mergeId,
+        jobId,
+        status,
+        outputUrl: mergeJob.outputUrl,
+      },
+      'Merge job status retrieved successfully',
+    );
+  }
 }

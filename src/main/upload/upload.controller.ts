@@ -130,13 +130,13 @@ export class UploadController {
     return this.uploadService.mergeVideos(files);
   }
 
-  // @Get('merge-job/:mergeId')
-  // @ApiOperation({ summary: 'Get video merge job status' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Merge job status retrieved successfully',
-  // })
-  // async getMergeJobStatus(@Param('mergeId') mergeId: string) {
-  //   return this.uploadService.getMergeJobStatus(mergeId);
-  // }
+  @Get('merge-job/:mergeId')
+  @ApiOperation({ summary: 'Get video merge job status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Merge job status retrieved successfully',
+  })
+  async getMergeJobStatus(@Param('mergeId') mergeId: string) {
+    return this.uploadService.getMergeJobStatus(mergeId);
+  }
 }

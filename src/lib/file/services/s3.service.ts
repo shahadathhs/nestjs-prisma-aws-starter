@@ -3,6 +3,7 @@ import { AppError } from '@/core/error/handle-error.app';
 import { PrismaService } from '@/lib/prisma/prisma.service';
 import {
   CreateJobCommand,
+  GetJobCommand,
   MediaConvertClient,
 } from '@aws-sdk/client-mediaconvert';
 import {
@@ -244,6 +245,22 @@ export class S3Service {
     return {
       jobId: result.Job?.Id,
       outputUrl: this.buildS3Url(outputKey),
+    };
+  }
+
+  async getMergeJobStatus(jobId: string): Promise<any> {
+    const command = new GetJobCommand({ Id: jobId });
+    const result = await this.mediaConvert.send(command);
+
+    if (!result.Job || !result.Job.Status) {
+      this.logger.error('Failed to get job status', result);
+      throw new AppError(500, 'Failed to get job status');
+    }
+
+    return {
+      status: result.Job?.Status,
+      job: result.Job,
+      result,
     };
   }
 
