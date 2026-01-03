@@ -9,10 +9,12 @@ import { AppError } from '@/core/error/handle-error.app';
 import { HandleError } from '@/core/error/handle-error.decorator';
 import { S3Service } from '@/lib/file/services/s3.service';
 import { PrismaService } from '@/lib/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class UploadService {
+  private readonly logger = new Logger(UploadService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3Service,
@@ -127,6 +129,11 @@ export class UploadService {
 
     // Extract video URLs
     const videoUrls = uploadedFiles.map((file) => file.url);
+
+    this.logger.log(
+      `Uploaded ${uploadedFiles.length} videos for merging.`,
+      videoUrls,
+    );
 
     // Create merge job in AWS MediaConvert
     const { jobId, outputUrl } = await this.s3.createMergeJob(videoUrls);

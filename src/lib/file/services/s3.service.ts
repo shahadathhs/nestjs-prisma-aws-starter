@@ -205,6 +205,28 @@ export class S3Service {
             Outputs: [
               {
                 ContainerSettings: { Container: 'MP4' },
+                VideoDescription: {
+                  CodecSettings: {
+                    Codec: 'H_264',
+                    H264Settings: {
+                      RateControlMode: 'QVBR',
+                      SceneChangeDetect: 'TRANSITION_DETECTION',
+                      MaxBitrate: 5000000,
+                    },
+                  },
+                },
+                AudioDescriptions: [
+                  {
+                    CodecSettings: {
+                      Codec: 'AAC',
+                      AacSettings: {
+                        Bitrate: 96000,
+                        CodingMode: 'CODING_MODE_2_0',
+                        SampleRate: 48000,
+                      },
+                    },
+                  },
+                ],
               },
             ],
           },
