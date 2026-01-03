@@ -2,9 +2,14 @@ import { ENVEnum } from '@/common/enum/env.enum';
 import { AppError } from '@/core/error/handle-error.app';
 import { PrismaService } from '@/lib/prisma/prisma.service';
 import {
+  AudioCodec,
+  AudioDefaultSelection,
   CreateJobCommand,
   GetJobCommand,
+  H264RateControlMode,
+  H264SceneChangeDetect,
   MediaConvertClient,
+  VideoCodec,
 } from '@aws-sdk/client-mediaconvert';
 import {
   DeleteObjectCommand,
@@ -188,46 +193,72 @@ export class S3Service {
   async createMergeJob(
     videoUrls: string[],
   ): Promise<{ jobId: string; outputUrl: string }> {
+    if (videoUrls.length < 2) {
+      throw new AppError(400, 'At least 2 videos are required for merging');
+    }
+
     const outputName = `merged-${uuid()}.mp4`;
-    const outputKey = `merged/${outputName}`;
+    const s3Destination = `s3://${this.AWS_S3_BUCKET_NAME}/merged/`;
+
+    // Create Inputs: each input needs a unique AudioSelector name
+    const inputs = videoUrls.map((url, index) => ({
+      FileInput: url,
+      AudioSelectors: {
+        [`AudioSelector${index}`]: {
+          DefaultSelection: AudioDefaultSelection.DEFAULT,
+        },
+      },
+      VideoSelector: {},
+    }));
+
+    this.logger.log(
+      `Creating merge job for videos: ${videoUrls.join(', ')}`,
+      JSON.stringify(inputs, null, 2),
+    );
+
+    // AudioDescriptions: reference first input selector
+    // MediaConvert can merge all video inputs into one output
+    const audioDescriptions = [
+      {
+        AudioSelectorName: 'AudioSelector0', // must match first input selector
+        CodecSettings: {
+          Codec: AudioCodec.AAC,
+          AacSettings: {
+            Bitrate: 96000,
+            CodingMode: 'CODING_MODE_2_0' as const,
+            SampleRate: 48000,
+          },
+        },
+      },
+    ];
+
+    // VideoDescriptions: one output for all inputs
+    const videoDescription = {
+      CodecSettings: {
+        Codec: VideoCodec.H_264,
+        H264Settings: {
+          RateControlMode: H264RateControlMode.QVBR,
+          MaxBitrate: 5000000,
+          SceneChangeDetect: H264SceneChangeDetect.TRANSITION_DETECTION,
+        },
+      },
+    };
 
     const command = new CreateJobCommand({
       Role: this.AWS_MEDIACONVERT_ROLE_ARN,
       Settings: {
-        Inputs: videoUrls.map((url) => ({ FileInput: url })),
+        Inputs: inputs,
         OutputGroups: [
           {
             OutputGroupSettings: {
               Type: 'FILE_GROUP_SETTINGS',
-              FileGroupSettings: {
-                Destination: `s3://${this.AWS_S3_BUCKET_NAME}/merged/`,
-              },
+              FileGroupSettings: { Destination: s3Destination },
             },
             Outputs: [
               {
                 ContainerSettings: { Container: 'MP4' },
-                VideoDescription: {
-                  CodecSettings: {
-                    Codec: 'H_264',
-                    H264Settings: {
-                      RateControlMode: 'QVBR',
-                      SceneChangeDetect: 'TRANSITION_DETECTION',
-                      MaxBitrate: 5000000,
-                    },
-                  },
-                },
-                AudioDescriptions: [
-                  {
-                    CodecSettings: {
-                      Codec: 'AAC',
-                      AacSettings: {
-                        Bitrate: 96000,
-                        CodingMode: 'CODING_MODE_2_0',
-                        SampleRate: 48000,
-                      },
-                    },
-                  },
-                ],
+                VideoDescription: videoDescription,
+                AudioDescriptions: audioDescriptions,
               },
             ],
           },
@@ -237,14 +268,19 @@ export class S3Service {
 
     const result = await this.mediaConvert.send(command);
 
-    if (!result.Job || !result.Job.Id) {
+    if (!result.Job?.Id) {
       this.logger.error('Failed to create merge job', result);
       throw new AppError(500, 'Failed to create merge job');
     }
 
+    this.logger.log(
+      `Created merge job with ID: ${result.Job.Id}`,
+      JSON.stringify(result, null, 2),
+    );
+
     return {
-      jobId: result.Job?.Id,
-      outputUrl: this.buildS3Url(outputKey),
+      jobId: result.Job.Id,
+      outputUrl: `https://${this.AWS_S3_BUCKET_NAME}.s3.${this.AWS_REGION}.amazonaws.com/merged/${outputName}`,
     };
   }
 
