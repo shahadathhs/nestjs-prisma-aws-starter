@@ -271,9 +271,27 @@ export class S3Service {
       throw new AppError(500, 'Failed to create merge job');
     }
 
+    // Get the NameModifier AWS actually used
+    const nameModifier =
+      result.Job.Settings?.OutputGroups?.[0]?.Outputs?.[0]?.NameModifier;
+
+    if (!nameModifier) {
+      throw new AppError(
+        500,
+        'Failed to get NameModifier from AWS MediaConvert job',
+      );
+    }
+
+    // First input base name
+    const firstInputBase =
+      videoUrls[0].split('/').pop()?.replace('.mp4', '') || '';
+
+    // Build the exact output URL
+    const outputUrl = `https://${this.AWS_S3_BUCKET_NAME}.s3.${this.AWS_REGION}.amazonaws.com/merged/${firstInputBase}${nameModifier}.mp4`;
+
     return {
       jobId: result.Job.Id,
-      outputUrl: `https://${this.AWS_S3_BUCKET_NAME}.s3.${this.AWS_REGION}.amazonaws.com/merged/${outputName}`,
+      outputUrl,
     };
   }
 
