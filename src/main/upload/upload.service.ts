@@ -138,11 +138,6 @@ export class UploadService {
     // Create merge job in AWS MediaConvert
     const { jobId, outputUrl } = await this.s3.createMergeJob(videoUrls);
 
-    const firstTwo = await this.s3.createMergeTwoVideos(
-      videoUrls[0],
-      videoUrls[1],
-    );
-
     // Save the merge job to database for tracking
     const mergeRecord = await this.prisma.client.videoMergeJob.create({
       data: {
@@ -153,18 +148,10 @@ export class UploadService {
       },
     });
 
-    const mergedRecordTwo = await this.prisma.client.videoMergeJob.create({
-      data: {
-        jobId: firstTwo.jobId,
-        outputUrl: firstTwo.outputUrl,
-        status: 'SUBMITTED',
-        sourceFileIds: uploadedFiles.slice(0, 2).map((f) => f.id),
-      },
+    this.logger.log(`Created merge job with ID: ${jobId}`, {
+      mergeRecordId: mergeRecord.id,
+      outputUrl,
     });
-
-    this.logger.log(
-      `Created merge job with ID: ${jobId} and output URL: ${outputUrl}`,
-    );
 
     return successResponse(
       {
@@ -178,7 +165,7 @@ export class UploadService {
           url: f.url,
           size: f.size,
         })),
-        mergedRecordTwo,
+        count: uploadedFiles.length,
       },
       'Videos uploaded and merge job created successfully',
     );

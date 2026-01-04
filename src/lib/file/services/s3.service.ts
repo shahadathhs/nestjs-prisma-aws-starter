@@ -194,16 +194,17 @@ export class S3Service {
   async createMergeJob(
     videoUrls: string[],
   ): Promise<{ jobId: string; outputUrl: string }> {
-    if (videoUrls.length < 2) {
-      throw new AppError(400, 'At least 2 videos are required for merging');
+    if (!videoUrls || videoUrls.length < 2) {
+      throw new AppError(400, 'At least 2 videos are required for merging.');
     }
 
     const outputName = `merged-${uuid()}.mp4`;
     const s3Destination = `s3://${this.AWS_S3_BUCKET_NAME}/merged/`;
 
-    // Create Inputs: each input gets a unique AudioSelector
+    // Build Inputs (each one gets one AudioSelector)
     const inputs = videoUrls.map((url, index) => ({
       FileInput: url,
+      InputClippings: [], // REQUIRED for concatenation
       AudioSelectors: {
         [`AudioSelector${index}`]: {
           DefaultSelection: AudioDefaultSelection.DEFAULT,
@@ -212,15 +213,10 @@ export class S3Service {
       VideoSelector: {},
     }));
 
-    this.logger.log(
-      `Creating merge job for videos: ${videoUrls.join(', ')}`,
-      JSON.stringify(inputs, null, 2),
-    );
-
-    // One AudioDescription pointing to the first input selector
+    // AUDIO: Use the FIRST input's audio track
     const audioDescriptions = [
       {
-        AudioSelectorName: 'AudioSelector0', // must match first input selector
+        AudioSourceName: 'AudioSelector0',
         CodecSettings: {
           Codec: AudioCodec.AAC,
           AacSettings: {
@@ -232,6 +228,7 @@ export class S3Service {
       },
     ];
 
+    // VIDEO settings
     const videoDescription = {
       CodecSettings: {
         Codec: VideoCodec.H_264,
@@ -243,7 +240,7 @@ export class S3Service {
       },
     };
 
-    // Send CreateJobCommand
+    // Final MediaConvert Job
     const command = new CreateJobCommand({
       Role: this.AWS_MEDIACONVERT_ROLE_ARN,
       Settings: {
@@ -256,7 +253,7 @@ export class S3Service {
             },
             Outputs: [
               {
-                NameModifier: outputName.replace('.mp4', ''), // important!
+                NameModifier: outputName.replace('.mp4', ''),
                 ContainerSettings: { Container: 'MP4' },
                 VideoDescription: videoDescription,
                 AudioDescriptions: audioDescriptions,
@@ -273,11 +270,6 @@ export class S3Service {
       this.logger.error('Failed to create merge job', result);
       throw new AppError(500, 'Failed to create merge job');
     }
-
-    this.logger.log(
-      `Created merge job with ID: ${result.Job.Id}`,
-      JSON.stringify(result, null, 2),
-    );
 
     return {
       jobId: result.Job.Id,
