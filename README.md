@@ -2,20 +2,10 @@
 
 > A production-ready, feature-rich starter template for building scalable backend applications.
 
-[![DeepSource](https://app.deepsource.com/gh/shahadathhs/nestjs-prisma-aws-starter.svg/?label=active+issues&show_trend=true&token=your-token)](https://app.deepsource.com/gh/shahadathhs/nestjs-prisma-aws-starter)
+
+[![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/) [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)](https://www.prisma.io/) [![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/) [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/) [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) 
 [![License: UNLICENSED](https://img.shields.io/badge/License-UNLICENSED-yellow.svg)](https://opensource.org/licenses/UNLICENSED)
 
-## 📖 Documentation
-
-The documentation has been split into detailed sections:
-
-- **[✨ Features](docs/FEATURES.md)** - Overview of tech stack and capabilities.
-- **[🛠️ Setup & Installation](docs/SETUP_INSTALLATION.md)** - Prerequisites, Environment Setup, and Running Locally.
-- **[📁 Project Structure](docs/PROJECT_STRUCTURE.md)** - Directory layout explanation.
-- **[⌨️ Commands](docs/COMMANDS.md)** - Guide to Makefile commands and npm scripts.
-- **[🚀 Deployment](docs/DEPLOYMENT.md)** - Docker architecture, CI/CD pipelines, and Production guides.
-- **[☁️ File Upload](docs/FILE_UPLOAD.md)** - S3 storage and Video merging guide.
-- **[💾 Backup System](docs/BACKUP_SYSTEM.md)** - Database backup and restore procedures.
 
 ## ⚡ Quick Start
 
@@ -31,19 +21,22 @@ The documentation has been split into detailed sections:
     # Edit .env with your credentials
     ```
 
-3.  **Run Locally (Hybrid Mode)**:
+3.  **Run with Docker**:
     ```bash
-    make local
+    make dev-up
     ```
-    *Starts DB & Redis in Docker, runs the API natively.*
+    *This runs the full stack (App + DB + Redis) with hot-reload.*
 
-4.  **Visit API Docs**:
-    Open [http://localhost:3000/docs](http://localhost:3000/docs)
+## 📖 Documentation
+
+- **[Features & Tech Stack](docs/FEATURES.md)**
+- **[Installation Guide](docs/SETUP_INSTALLATION.md)**
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)**
+- **[Commands Reference](docs/COMMANDS.md)**
+- **[Deployment Guide](docs/DEPLOYMENT.md)**
+- **[File Upload System](docs/FILE_UPLOAD.md)**
+- **[Backup System](docs/BACKUP_SYSTEM.md)**
 
 ## 🤝 Contributing
-
-Contributions are welcome! Please run `pnpm commit` when committing to ensure your commit messages follow our conventions.
-
----
 
 **Author**: [@shahadathhs](https://github.com/shahadathhs)
