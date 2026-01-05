@@ -328,10 +328,8 @@ FORCE_RESTORE=true /scripts/restore-database.sh restore backup_file.dump.gz
 
 ### Log Locations
 
-- **Backup logs**: `/backups/backup.log`
-- **Cron logs**: `/backups/cron.log`
-- **Monitor logs**: `/backups/monitor.log`
-- **Restore logs**: `/backups/restore.log`
+- **Backup/Cron logs**: `/var/log/backup/cron.log`
+- **Monitor logs**: `/var/log/backup/monitor.log`
 
 ### Manual Backup Testing
 

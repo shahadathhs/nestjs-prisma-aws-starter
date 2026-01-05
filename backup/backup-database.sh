@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Required env vars:
-# DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
-# AWS_S3_BUCKET (optional)
-# AWS_S3_PREFIX (optional)
-# AWS_REGION (required if AWS_S3_BUCKET provided)
-# RETENTION_DAYS (defaults to 7)
-# Use BACKUP_FORMAT=plain or custom (we default to plain)
-
+# Configuration
 : "${DB_HOST:=db}"
 : "${DB_PORT:=5432}"
 : "${DB_USER:=postgres}"
 : "${DB_PASSWORD:=postgres}"
-: "${DB_NAME:=app_db}"
+: "${DB_NAME:=nestjs_starter_db}"
 : "${RETENTION_DAYS:=7}"
-: "${BACKUP_FORMAT:=plain}"   # plain = SQL; custom = pg_dump -Fc
+: "${BACKUP_FORMAT:=plain}"
 
 AWS_UPLOAD=false
 if [[ -n "${AWS_S3_BUCKET:-}" ]]; then

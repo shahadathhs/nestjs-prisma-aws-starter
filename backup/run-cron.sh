@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${BACKUP_SCHEDULE:=0 3 * * *}"   # fallback if not set
+: "${BACKUP_SCHEDULE:=0 3 * * *}"
 
-# Write a crontab line (redirect logs into /var/log/backup/backup.log)
-CRONLINE="$BACKUP_SCHEDULE /usr/local/bin/backup.sh >> /var/log/backup/backup.log 2>&1"
+# Log file location
+LOG_FILE="/var/log/backup/cron.log"
+touch "$LOG_FILE"
 
-# Install crontab
+# Export current environment variables to a file so cron can use them
+# We filter out some internal bash/system variables to be clean
+declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /scripts/container.env
+
+# Write crontab
+# We explicitly source the env file before running the script
+CRONLINE="$BACKUP_SCHEDULE . /scripts/container.env; /scripts/backup-database.sh >> $LOG_FILE 2>&1"
+
 echo "$CRONLINE" | crontab -
 
-# Run an immediate backup once on container start (optional)
-# Run in background so cron runs next scheduled job
-/usr/local/bin/backup.sh >> /var/log/backup/first-run.log 2>&1 || echo "First run failed, continuing..."
+echo "$(date): Starting cron service..." >> "$LOG_FILE"
+echo "Schedule: $BACKUP_SCHEDULE" >> "$LOG_FILE"
 
 # Start cron in foreground
 exec cron -f

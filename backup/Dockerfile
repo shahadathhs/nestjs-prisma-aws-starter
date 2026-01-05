@@ -2,9 +2,9 @@
 FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH="/usr/local/bin:${PATH}"
+ENV PATH="/scripts:${PATH}"
 
-# Install packages: cron, pg client, gzip, curl, openssl libs for AWS, etc.
+# Install packages
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
      cron \
@@ -17,15 +17,15 @@ RUN apt-get update \
   && pip install --no-cache-dir awscli \
   && rm -rf /var/lib/apt/lists/*
 
-# Create backup directory and logs
-RUN mkdir -p /backups /scripts /var/log/backup \
-  && chmod 755 /scripts
+# Create directories
+RUN mkdir -p /backups /scripts /var/log/backup
 
-# Copy scripts (should be executable)
-COPY run-cron.sh /usr/local/bin/run-cron.sh
-COPY backup.sh /usr/local/bin/backup.sh
+# Copy scripts
+COPY run-cron.sh /scripts/run-cron.sh
+COPY backup-database.sh /scripts/backup-database.sh
+COPY restore-database.sh /scripts/restore-database.sh
 
-RUN chmod +x /usr/local/bin/run-cron.sh /usr/local/bin/backup.sh
+RUN chmod +x /scripts/*.sh
 
-# Entrypoint: start run-cron which writes crontab and runs cron in foreground
-CMD ["/usr/local/bin/run-cron.sh"]
+# Entrypoint
+CMD ["/scripts/run-cron.sh"]

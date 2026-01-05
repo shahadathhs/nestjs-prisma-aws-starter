@@ -193,18 +193,18 @@ services:
       DB_USER: postgres
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
 
-      BACKUP_SCHEDULE: '0 3 * * *' # Daily 3AM
-      RETENTION_DAYS: 30
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 3 * * *}
+      RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
 
       AWS_REGION: ${AWS_REGION}
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET_NAME}
       AWS_S3_PREFIX: backups/db
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      BACKUP_FORMAT: plain
+      BACKUP_FORMAT: ${BACKUP_FORMAT:-plain}
 
     volumes:
-      - backups_data:/backups
+      - backups-data:/backups
       - ./backup/logs:/var/log/backup
 
     depends_on:

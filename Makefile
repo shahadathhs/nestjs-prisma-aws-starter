@@ -170,7 +170,7 @@ backup-manual:
 backup-logs:
 	@echo "Backup service logs:"
 	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec $(PACKAGE_NAME)_backup tail -f /backups/cron.log; \
+		docker exec $(PACKAGE_NAME)_backup tail -f /var/log/backup/cron.log; \
 	else \
 		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
 	fi
