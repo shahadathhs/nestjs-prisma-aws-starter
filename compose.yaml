@@ -179,12 +179,11 @@ services:
     restart: always
 
   backup:
-    profiles: ['prod']
     build:
-      context: .
-      dockerfile: Dockerfile.backup
+      context: ./backup
     container_name: ${PACKAGE_NAME}_backup
-    restart: always
+    profiles: ['prod']
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -192,19 +191,35 @@ services:
       DB_PORT: 5432
       DB_NAME: ${PACKAGE_NAME}_db
       DB_USER: postgres
-      DB_PASSWORD: postgres
-      BACKUP_SCHEDULE: "0 2 * * *"  # Daily at 2:00 AM
-      RETENTION_DAYS: 7
-      COMPRESSION: gzip
-      BACKUP_FORMAT: custom
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+      BACKUP_SCHEDULE: '0 3 * * *' # Daily 3AM
+      RETENTION_DAYS: 30
+
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_S3_PREFIX: backups/db
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      BACKUP_FORMAT: plain
+
     volumes:
-      - db_data:/var/lib/postgresql/data:ro   # read-only
-      - files-data:/app/uploads:ro            # read-only
-      - backups-data:/backups                 # backup storage
-      - ./scripts:/scripts:ro
+      - backups_data:/backups
+      - ./backup/logs:/var/log/backup
+
     depends_on:
       db:
         condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} || exit 1',
+        ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
 
 volumes:
   db_data:

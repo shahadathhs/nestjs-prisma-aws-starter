@@ -96,43 +96,9 @@ services:
       retries: 5
     restart: unless-stopped
 
-  backup:
-    build:
-      context: .
-      dockerfile: Dockerfile.backup
-    container_name: ${PACKAGE_NAME}_dev_backup
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: ${PACKAGE_NAME}_db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      BACKUP_SCHEDULE: "0 3 * * *"  # Daily at 3:00 AM for dev
-      RETENTION_DAYS: 3  # Keep fewer backups in dev
-      COMPRESSION: gzip
-      BACKUP_FORMAT: custom
-      # AWS S3 Configuration (optional)
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-}
-      AWS_S3_PREFIX: dev-database-backups
-      AWS_REGION: ${AWS_REGION:-us-east-1}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
-    volumes:
-      - dev_backups_data:/backups
-      - ./scripts:/scripts:ro
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - default
-
 volumes:
   dev_db_data:
   dev_redis_data:
-  dev_backups_data:
 
 networks:
   default:
