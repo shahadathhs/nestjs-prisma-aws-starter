@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/shahadathhs/nestjs-prisma-aws-starter/compare/v1.1.0...v1.2.0) (2026-01-05)
+
+
+### Features
+
+* updated example env file ([526f119](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/526f119c88975ae265cbbe8d19d837f656ad64e5))
+
 # [1.1.0](https://github.com/shahadathhs/nestjs-prisma-aws-starter/compare/v1.0.2...v1.1.0) (2026-01-05)
 
 
