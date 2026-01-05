@@ -1,8 +1,8 @@
 # backup/Dockerfile
 FROM python:3.12-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH="/scripts:${PATH}"
+# Set environment variables
+WORKDIR /backup
 
 # Install packages
 RUN apt-get update \
@@ -17,15 +17,13 @@ RUN apt-get update \
   && pip install --no-cache-dir awscli \
   && rm -rf /var/lib/apt/lists/*
 
-# Create directories
-RUN mkdir -p /backups /scripts /var/log/backup
+# Copy backup
+COPY run-cron.sh ./run-cron.sh
+COPY backup-database.sh ./backup-database.sh
+COPY restore-database.sh ./restore-database.sh
 
-# Copy scripts
-COPY run-cron.sh /scripts/run-cron.sh
-COPY backup-database.sh /scripts/backup-database.sh
-COPY restore-database.sh /scripts/restore-database.sh
-
-RUN chmod +x /scripts/*.sh
+# Make scripts executable
+RUN chmod +x ./run-cron.sh ./backup-database.sh ./restore-database.sh
 
 # Entrypoint
-CMD ["/scripts/run-cron.sh"]
+CMD ["/backup/run-cron.sh"]

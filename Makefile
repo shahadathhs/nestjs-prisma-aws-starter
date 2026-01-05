@@ -154,42 +154,34 @@ networks:
 backup-list:
 	@echo "Available backups:"
 	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec $(PACKAGE_NAME)_backup /scripts/restore-database.sh list; \
+		docker exec -i $(PACKAGE_NAME)_backup bash -c '"backup/restore-database.sh list"'; \
 	else \
-		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+		echo "Backup service is not running. Start it with '\''make start'\'' or '\''make dev-up'\''"; \
 	fi
 
 backup-manual:
 	@echo "Creating manual backup..."
 	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec $(PACKAGE_NAME)_backup /scripts/backup-database.sh; \
+		docker exec -i $(PACKAGE_NAME)_backup bash -c '"backup/backup-database.sh"'; \
 	else \
-		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
-	fi
-
-backup-logs:
-	@echo "Backup service logs:"
-	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec $(PACKAGE_NAME)_backup tail -f /var/log/backup/cron.log; \
-	else \
-		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+		echo "Backup service is not running. Start it with '\''make start'\'' or '\''make dev-up'\''"; \
 	fi
 
 backup-restore:
 	@echo "Available backups:"
 	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec $(PACKAGE_NAME)_backup /scripts/restore-database.sh list; \
+		docker exec -i $(PACKAGE_NAME)_backup bash -c '"backup/restore-database.sh list"'; \
 		echo ""; \
 		read -p "Enter backup filename to restore: " backup_file; \
 		if [ -n "$$backup_file" ]; then \
 			echo "WARNING: This will replace the current database. Are you sure? [y/N]"; \
 			read -r confirm; \
 			if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
-				docker exec $(PACKAGE_NAME)_backup /bin/bash -c "FORCE_RESTORE=true /scripts/restore-database.sh restore $$backup_file"; \
+				docker exec -i $(PACKAGE_NAME)_backup bash -c '"FORCE_RESTORE=true backup/restore-database.sh restore $$backup_file"'; \
 			else \
 				echo "Restore cancelled."; \
 			fi; \
 		fi; \
 	else \
-		echo "Backup service is not running. Start it with 'make start' or 'make dev-up'"; \
+		echo "Backup service is not running. Start it with '\''make start'\'' or '\''make dev-up'\''"; \
 	fi

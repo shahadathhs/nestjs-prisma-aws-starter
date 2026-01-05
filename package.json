@@ -5,10 +5,10 @@
   "author": "https://github.com/shahadathhs",
   "private": true,
   "license": "UNLICENSED",
-  "scripts": {
+  "backup": {
     "dev": "nest start --watch",
     "build": "npx nest build",
-    "start": "npx prisma generate && npx prisma migrate deploy && node dist/src/main",
+    "start": "npx prisma migrate deploy && node dist/src/main",
     "start:debug": "nest start --debug --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

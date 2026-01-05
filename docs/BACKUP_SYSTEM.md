@@ -16,7 +16,7 @@ This project includes a comprehensive automated database backup system for Postg
 
 ### Components
 
-1. **Backup Scripts** (`/scripts/`)
+1. **Backup Scripts** (`/backup/`)
    - `backup-database.sh` - Main backup script
    - `restore-database.sh` - Database restoration script
    - `backup-monitor.sh` - Health monitoring and notifications
@@ -272,13 +272,13 @@ make backup-restore
 docker exec -it nestjs_starter_backup bash
 
 # List backups
-/scripts/restore-database.sh list
+/backup/restore-database.sh list
 
 # Restore specific backup
-/scripts/restore-database.sh restore /backups/backup_file.dump.gz
+/backup/restore-database.sh restore /backups/backup_file.dump.gz
 
 # Restore from S3
-/scripts/restore-database.sh restore-s3 s3://bucket/path/to/backup.dump.gz
+/backup/restore-database.sh restore-s3 s3://bucket/path/to/backup.dump.gz
 ```
 
 ### Force Restore
@@ -286,7 +286,7 @@ docker exec -it nestjs_starter_backup bash
 To replace the existing database:
 
 ```bash
-FORCE_RESTORE=true /scripts/restore-database.sh restore backup_file.dump.gz
+FORCE_RESTORE=true /backup/restore-database.sh restore backup_file.dump.gz
 ```
 
 ## Troubleshooting
@@ -323,7 +323,7 @@ FORCE_RESTORE=true /scripts/restore-database.sh restore backup_file.dump.gz
 4. **Email Notifications Not Working**
    ```bash
    # Test email configuration
-   docker exec nestjs_starter_backup /scripts/backup-monitor.sh check
+   docker exec nestjs_starter_backup /backup/backup-monitor.sh check
    ```
 
 ### Log Locations
@@ -335,13 +335,13 @@ FORCE_RESTORE=true /scripts/restore-database.sh restore backup_file.dump.gz
 
 ```bash
 # Test backup script manually
-docker exec nestjs_starter_backup /scripts/backup-database.sh
+docker exec nestjs_starter_backup /backup/backup-database.sh
 
 # Verify backup was created
 docker exec nestjs_starter_backup ls -la /backups/
 
 # Test restore
-docker exec nestjs_starter_backup /scripts/restore-database.sh list
+docker exec nestjs_starter_backup /backup/restore-database.sh list
 ```
 
 ## Security Considerations

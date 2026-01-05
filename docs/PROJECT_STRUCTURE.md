@@ -3,13 +3,13 @@
 ```text
 ├── .github/workflows/     # CI/CD configuration
 ├── .husky/               # Git hooks
-├── backup/              # Database backup system & scripts
+├── backup/              # Database backup system & backup
 ├── docs/                # Project documentation
 ├── prisma/
 │   ├── schema/          # Split Prisma schema files
 │   ├── migrations/      # Database migrations
 │   └── generated/       # Generated Prisma Client
-├── scripts/             # Utility scripts (ci-hooks.js)
+├── backup/             # Utility backup (ci-hooks.js)
 ├── src/
 │   ├── main.ts         # Application entry point
 │   ├── app.module.ts   # Root module

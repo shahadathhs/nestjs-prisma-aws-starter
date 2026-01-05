@@ -9,11 +9,11 @@ touch "$LOG_FILE"
 
 # Export current environment variables to a file so cron can use them
 # We filter out some internal bash/system variables to be clean
-declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /scripts/container.env
+declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /backup/container.env
 
 # Write crontab
 # We explicitly source the env file before running the script
-CRONLINE="$BACKUP_SCHEDULE . /scripts/container.env; /scripts/backup-database.sh >> $LOG_FILE 2>&1"
+CRONLINE="$BACKUP_SCHEDULE . /backup/container.env; /backup/backup-database.sh >> $LOG_FILE 2>&1"
 
 echo "$CRONLINE" | crontab -
 
