@@ -34,6 +34,7 @@ A production-ready, feature-rich starter template for building scalable backend 
 
 - File upload with Multer
 - AWS S3 integration
+- AWS Media Convert integration
 - Configurable upload limits (up to 500MB via Caddy)
 
 ### Background Jobs

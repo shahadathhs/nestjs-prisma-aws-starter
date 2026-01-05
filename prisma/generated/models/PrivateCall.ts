@@ -409,10 +409,6 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type PrivateCallCreateNestedOneWithoutParticipantsInput = {
   create?: Prisma.XOR<Prisma.PrivateCallCreateWithoutParticipantsInput, Prisma.PrivateCallUncheckedCreateWithoutParticipantsInput>
   connectOrCreate?: Prisma.PrivateCallCreateOrConnectWithoutParticipantsInput

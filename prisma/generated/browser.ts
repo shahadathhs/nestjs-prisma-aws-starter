@@ -33,6 +33,11 @@ export type RefreshToken = Prisma.RefreshTokenModel
  */
 export type FileInstance = Prisma.FileInstanceModel
 /**
+ * Model VideoMergeJob
+ * 
+ */
+export type VideoMergeJob = Prisma.VideoMergeJobModel
+/**
  * Model Notification
  * 
  */

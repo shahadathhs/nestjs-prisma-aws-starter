@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/shahadathhs/nestjs-prisma-aws-starter/compare/v1.0.2...v1.1.0) (2026-01-05)
+
+
+### Bug Fixes
+
+* fixed video merge s3 servcie ([72d0fa4](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/72d0fa4e18486354b1ae7fe3be60ef97d90cf2c3))
+
+
+### Features
+
+* fixing create merge job ([e86092f](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/e86092fc35cf3b0d3082de4cff0f31827f4aecc7))
+* merge multiple video completed ([71b85b8](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/71b85b8d9c8273843d985ad98ab0d51a87143bd1))
+* merge multiple video completed ([47cb3c7](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/47cb3c7212db8d49c9ed5e47060b2bce83231cea))
+* merge multiple video using aws mediaconvert ([ac52227](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/ac52227b976b2f2fa9fd24231c77cdd586cd62bc))
+* merge two video completed ([3bd69ec](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/3bd69ece4b1f006942d0c67ae698fab1d611db81))
+* merge two video completed ([ec2677a](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/ec2677a710719ca04bedc15b4327f857f7de7083))
+* merge vided status endpoint completed ([4305270](https://github.com/shahadathhs/nestjs-prisma-aws-starter/commit/43052705eccf562b7712112e4d7e58811f1cb59f))
+
 ## [1.0.2](https://github.com/shahadathhs/nestjs-prisma-aws-starter/compare/v1.0.1...v1.0.2) (2025-12-07)
 
 ### Bug Fixes

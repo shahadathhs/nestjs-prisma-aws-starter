@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.0.1
- * Query Engine version: f09f2815f091dbba658cdcd2264306d88bb5bda6
+ * Prisma Client JS version: 7.1.0
+ * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.0.1",
-  engine: "f09f2815f091dbba658cdcd2264306d88bb5bda6"
+  client: "7.1.0",
+  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
 }
 
 /**
@@ -387,6 +387,7 @@ export const ModelName = {
   UserOtp: 'UserOtp',
   RefreshToken: 'RefreshToken',
   FileInstance: 'FileInstance',
+  VideoMergeJob: 'VideoMergeJob',
   Notification: 'Notification',
   UserNotification: 'UserNotification',
   PrivateCall: 'PrivateCall',
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userOtp" | "refreshToken" | "fileInstance" | "notification" | "userNotification" | "privateCall" | "privateCallParticipant" | "privateConversation" | "privateMessage" | "privateMessageStatus" | "user"
+    modelProps: "userOtp" | "refreshToken" | "fileInstance" | "videoMergeJob" | "notification" | "userNotification" | "privateCall" | "privateCallParticipant" | "privateConversation" | "privateMessage" | "privateMessageStatus" | "user"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -633,6 +634,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.FileInstanceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.FileInstanceCountAggregateOutputType> | number
+        }
+      }
+    }
+    VideoMergeJob: {
+      payload: Prisma.$VideoMergeJobPayload<ExtArgs>
+      fields: Prisma.VideoMergeJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VideoMergeJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VideoMergeJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>
+        }
+        findFirst: {
+          args: Prisma.VideoMergeJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VideoMergeJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>
+        }
+        findMany: {
+          args: Prisma.VideoMergeJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>[]
+        }
+        create: {
+          args: Prisma.VideoMergeJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>
+        }
+        createMany: {
+          args: Prisma.VideoMergeJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VideoMergeJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>[]
+        }
+        delete: {
+          args: Prisma.VideoMergeJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>
+        }
+        update: {
+          args: Prisma.VideoMergeJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.VideoMergeJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VideoMergeJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VideoMergeJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.VideoMergeJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMergeJobPayload>
+        }
+        aggregate: {
+          args: Prisma.VideoMergeJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVideoMergeJob>
+        }
+        groupBy: {
+          args: Prisma.VideoMergeJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoMergeJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VideoMergeJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoMergeJobCountAggregateOutputType> | number
         }
       }
     }
@@ -1308,6 +1383,21 @@ export const FileInstanceScalarFieldEnum = {
 export type FileInstanceScalarFieldEnum = (typeof FileInstanceScalarFieldEnum)[keyof typeof FileInstanceScalarFieldEnum]
 
 
+export const VideoMergeJobScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  outputUrl: 'outputUrl',
+  outputFileId: 'outputFileId',
+  status: 'status',
+  errorMessage: 'errorMessage',
+  sourceFileIds: 'sourceFileIds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VideoMergeJobScalarFieldEnum = (typeof VideoMergeJobScalarFieldEnum)[keyof typeof VideoMergeJobScalarFieldEnum]
+
+
 export const NotificationScalarFieldEnum = {
   id: 'id',
   type: 'type',
@@ -1440,6 +1530,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -1447,14 +1545,6 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -1728,7 +1818,7 @@ export type PrismaClientOptions = ({
    *  { emit: 'stdout', level: 'error' }
    * 
    * ```
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+   * Read more in our [docs](https://pris.ly/d/logging).
    */
   log?: (LogLevel | LogDefinition)[]
   /**
@@ -1756,11 +1846,28 @@ export type PrismaClientOptions = ({
    * ```
    */
   omit?: GlobalOmitConfig
+  /**
+   * SQL commenter plugins that add metadata to SQL queries as comments.
+   * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+   * 
+   * @example
+   * ```
+   * const prisma = new PrismaClient({
+   *   adapter,
+   *   comments: [
+   *     traceContext(),
+   *     queryInsights(),
+   *   ],
+   * })
+   * ```
+   */
+  comments?: runtime.SqlCommenterPlugin[]
 }
 export type GlobalOmitConfig = {
   userOtp?: Prisma.UserOtpOmit
   refreshToken?: Prisma.RefreshTokenOmit
   fileInstance?: Prisma.FileInstanceOmit
+  videoMergeJob?: Prisma.VideoMergeJobOmit
   notification?: Prisma.NotificationOmit
   userNotification?: Prisma.UserNotificationOmit
   privateCall?: Prisma.PrivateCallOmit
