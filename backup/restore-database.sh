@@ -4,7 +4,7 @@ set -eo pipefail
 # Configuration
 : "${DB_HOST:=db}"
 : "${DB_PORT:=5432}"
-: "${DB_NAME:=nestjs_starter_db}"
+: "${DB_NAME:=app_db}"
 : "${DB_USER:=postgres}"
 : "${DB_PASSWORD:=postgres}"
 BACKUP_DIR="/backups"

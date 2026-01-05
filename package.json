@@ -5,7 +5,7 @@
   "author": "https://github.com/shahadathhs",
   "private": true,
   "license": "UNLICENSED",
-  "backup": {
+  "scripts": {
     "dev": "nest start --watch",
     "build": "npx nest build",
     "start": "npx prisma migrate deploy && node dist/src/main",

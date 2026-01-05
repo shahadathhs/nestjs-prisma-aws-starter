@@ -181,11 +181,14 @@ services:
   backup:
     build:
       context: ./backup
+      dockerfile: Dockerfile
     container_name: ${PACKAGE_NAME}_backup
     profiles: ['prod']
     restart: unless-stopped
+
     env_file:
       - .env
+
     environment:
       DB_HOST: db
       DB_PORT: 5432

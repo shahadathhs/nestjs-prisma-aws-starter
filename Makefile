@@ -1,10 +1,19 @@
-# Variables
-DOCKER_USERNAME=softvence
-PACKAGE_NAME=nestjs_starter
-PACKAGE_VERSION=latest
+# Load .env file if it exists
+ifneq (,$(wildcard ./.env))
+  include .env
+  export
+endif
+
+# Variables (can be overridden by .env or command line)
+DOCKER_USERNAME ?= softvence
+PACKAGE_NAME ?= nestjs_starter
+PACKAGE_VERSION ?= latest
 
 # Docker image name
 APP_IMAGE := $(DOCKER_USERNAME)/$(PACKAGE_NAME):$(PACKAGE_VERSION)
+
+# Export PACKAGE_NAME for scripts
+export PACKAGE_NAME
 
 # Compose files
 COMPOSE_FILE := compose.yaml
@@ -13,6 +22,9 @@ DEV_COMPOSE_FILE := compose.dev.yaml
 # Docker files
 DOCKERFILE := Dockerfile
 DEV_DOCKERFILE := Dockerfile.dev
+
+# Backup container name (derived from PACKAGE_NAME)
+BACKUP_CONTAINER=$(PACKAGE_NAME)_backup
 
 .PHONY: help build up start stop restart logs logs-api clean push ps dev-up dev-stop dev-logs dev-clean dev-ps local-up local-down local images volumes networks backup-list backup-manual backup-logs backup-restore
 
@@ -152,36 +164,13 @@ networks:
 # ==========================================
 
 backup-list:
-	@echo "Available backups:"
-	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec -i $(PACKAGE_NAME)_backup bash -c '"backup/restore-database.sh list"'; \
-	else \
-		echo "Backup service is not running. Start it with '\''make start'\'' or '\''make dev-up'\''"; \
-	fi
+	@bash ./backup/scripts/backup-list.sh
 
 backup-manual:
-	@echo "Creating manual backup..."
-	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec -i $(PACKAGE_NAME)_backup bash -c '"backup/backup-database.sh"'; \
-	else \
-		echo "Backup service is not running. Start it with '\''make start'\'' or '\''make dev-up'\''"; \
-	fi
+	@bash ./backup/scripts/backup-manual.sh
+
+backup-logs:
+	docker logs -f $(BACKUP_CONTAINER)
 
 backup-restore:
-	@echo "Available backups:"
-	@if docker ps -f name=$(PACKAGE_NAME)_backup --format "{{.Names}}" | grep -q $(PACKAGE_NAME)_backup; then \
-		docker exec -i $(PACKAGE_NAME)_backup bash -c '"backup/restore-database.sh list"'; \
-		echo ""; \
-		read -p "Enter backup filename to restore: " backup_file; \
-		if [ -n "$$backup_file" ]; then \
-			echo "WARNING: This will replace the current database. Are you sure? [y/N]"; \
-			read -r confirm; \
-			if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
-				docker exec -i $(PACKAGE_NAME)_backup bash -c '"FORCE_RESTORE=true backup/restore-database.sh restore $$backup_file"'; \
-			else \
-				echo "Restore cancelled."; \
-			fi; \
-		fi; \
-	else \
-		echo "Backup service is not running. Start it with '\''make start'\'' or '\''make dev-up'\''"; \
-	fi
+	@bash ./backup/scripts/backup-restore.sh

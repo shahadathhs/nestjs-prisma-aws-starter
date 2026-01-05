@@ -6,7 +6,7 @@ set -euo pipefail
 : "${DB_PORT:=5432}"
 : "${DB_USER:=postgres}"
 : "${DB_PASSWORD:=postgres}"
-: "${DB_NAME:=nestjs_starter_db}"
+: "${DB_NAME:=app_db}"
 : "${RETENTION_DAYS:=7}"
 : "${BACKUP_FORMAT:=plain}"
 
