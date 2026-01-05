@@ -17,13 +17,11 @@ RUN apt-get update \
   && pip install --no-cache-dir awscli \
   && rm -rf /var/lib/apt/lists/*
 
-# Copy backup
-COPY run-cron.sh ./run-cron.sh
-COPY backup-database.sh ./backup-database.sh
-COPY restore-database.sh ./restore-database.sh
+# Copy scripts folder
+COPY scripts/ /backup/scripts/
 
 # Make scripts executable
-RUN chmod +x ./run-cron.sh ./backup-database.sh ./restore-database.sh
+RUN chmod +x /backup/scripts/*.sh
 
 # Entrypoint
-CMD ["/backup/run-cron.sh"]
+CMD ["/backup/scripts/run-cron.sh"]

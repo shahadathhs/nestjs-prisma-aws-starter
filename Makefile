@@ -164,13 +164,13 @@ networks:
 # ==========================================
 
 backup-list:
-	@bash ./backup/scripts/backup-list.sh
+	@bash ./backup/scripts/manage.sh list
 
 backup-manual:
-	@bash ./backup/scripts/backup-manual.sh
+	@bash ./backup/scripts/manage.sh create
 
 backup-logs:
 	docker logs -f $(BACKUP_CONTAINER)
 
 backup-restore:
-	@bash ./backup/scripts/backup-restore.sh
+	@bash ./backup/scripts/manage.sh restore

@@ -13,7 +13,7 @@ declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /backup
 
 # Write crontab
 # We explicitly source the env file before running the script
-CRONLINE="$BACKUP_SCHEDULE . /backup/container.env; /backup/backup-database.sh >> $LOG_FILE 2>&1"
+CRONLINE="$BACKUP_SCHEDULE . /backup/container.env; /backup/scripts/backup-database.sh >> $LOG_FILE 2>&1"
 
 echo "$CRONLINE" | crontab -
 
